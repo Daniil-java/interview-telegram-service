@@ -1,0 +1,13 @@
+package com.kuklin.interview_telegram_service;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class InterviewTelegramServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(InterviewTelegramServiceApplication.class, args);
+	}
+
+}
