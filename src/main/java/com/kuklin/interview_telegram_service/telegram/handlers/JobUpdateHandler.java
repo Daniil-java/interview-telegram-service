@@ -24,36 +24,35 @@ public class JobUpdateHandler implements UpdateHandler {
     private static final String ERROR_MESSAGE = "Произошла ошибка! Не получилось сохранить новую должность:";
     private static final String SUCCESS_MESSAGE = "Новая должность сохранена: ";
 
+    private static final String AI_REQUEST_MESSAGE = "Ты должен ответить на вопрос " +
+            "является ли следующая строка должна являться должностью, " +
+            "на которую можно провести собеседование. Ответ должен быть однозначным," +
+            " не пиши ничего лишнего, только 1 - если является, и 0 - если нет;\n" +
+            "Строка: ";
+
     @Override
     public void handle(Update update, UserEntity userEntity) {
-
         Message requestMessage = update.getMessage();
         Long chatId = requestMessage.getChatId();
-
-        String aiRequestMessage = "Ты должен ответить на вопрос " +
-                "является ли следующая строка должна являться должностью, " +
-                "на которую можно провести собеседование. Ответ должен быть однозначным," +
-                " не пиши ничего лишнего, только 1 - если является, и 0 - если нет;\n" +
-                "Строка: ";
 
         String[] splitted = requestMessage.getText().split(TelegramBot.DELIMITER);
         String jobTittle = splitted[1];
 
         Long conversationId = openAiIntegrationService.getNewConversationId();
         MessageResponseDto response =
-                openAiIntegrationService.sendMessage(aiRequestMessage + jobTittle, conversationId);
+                openAiIntegrationService.sendMessage(AI_REQUEST_MESSAGE + jobTittle, conversationId);
 
         if (response.getContent().equals("0")) {
             telegramService.sendReturnedMessage(chatId, JOB_ERROR_MESSAGE);
             return;
         }
 
-        UserEntity user = userService.setJobTittleOrGetNull(userEntity.getId(), jobTittle);
+        userEntity = userService.setJobTittleOrGetNull(userEntity, jobTittle);
 
-        if (user == null) {
+        if (userEntity == null) {
             telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
         } else {
-            telegramService.sendReturnedMessage(chatId, SUCCESS_MESSAGE + user.getJobTittle());
+            telegramService.sendReturnedMessage(chatId, SUCCESS_MESSAGE + userEntity.getJobTittle());
         }
     }
 

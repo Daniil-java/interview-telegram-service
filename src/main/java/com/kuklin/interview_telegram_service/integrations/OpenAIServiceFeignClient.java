@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
-        value = "open-a-i-service-feign-client",
+        value = "open-ai-conversation-service",
         url = "http://localhost:8081/api/v1/"
 )
 public interface OpenAIServiceFeignClient {

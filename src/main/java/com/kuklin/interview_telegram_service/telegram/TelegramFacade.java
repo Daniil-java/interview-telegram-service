@@ -7,7 +7,6 @@ import com.kuklin.interview_telegram_service.services.UserService;
 import com.kuklin.interview_telegram_service.telegram.handlers.UpdateHandler;
 import com.kuklin.interview_telegram_service.telegram.utils.BotState;
 import com.kuklin.interview_telegram_service.telegram.utils.Command;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,13 +23,13 @@ public class TelegramFacade {
     private UserService userService;
     @Autowired
     private TelegramUserService telegramUserService;
-    private Map<String, UpdateHandler> map = new ConcurrentHashMap<>();
+    private Map<String, UpdateHandler> updateHandlerMap = new ConcurrentHashMap<>();
 
     public void register(String command, UpdateHandler updateHandler) {
-        if (map.containsKey(command)) {
+        if (updateHandlerMap.containsKey(command)) {
             log.error("This command is already exists!");
         }
-        map.put(command, updateHandler);
+        updateHandlerMap.put(command, updateHandler);
     }
 
     public void handleUpdate(Update update) {
@@ -38,6 +37,7 @@ public class TelegramFacade {
          На этапе разработки обработка сообщений
          происходит только от одного пользователя
          */
+        if (!update.hasCallbackQuery() && update.hasMessage()) return;
         User user = update.getMessage() != null ?
                 update.getMessage().getFrom() :
                 update.getCallbackQuery().getFrom();
@@ -55,13 +55,13 @@ public class TelegramFacade {
         } else {
             request = update.getMessage().getText();
         }
-        UpdateHandler currentUpdateHandler = map.get(request.split(TelegramBot.DELIMITER)[0]);
+        UpdateHandler currentUpdateHandler = updateHandlerMap.get(request.split(TelegramBot.DELIMITER)[0]);
         if (currentUpdateHandler != null) {
             return currentUpdateHandler;
         } else if (telegramUser.getBotState() == BotState.WAIT) {
-            return map.get(Command.ERROR.getCommandText());
+            return updateHandlerMap.get(Command.ERROR.getCommandText());
         } else {
-            return map.get(Command.INTERVIEW.getCommandText());
+            return updateHandlerMap.get(Command.INTERVIEW.getCommandText());
         }
 
     }

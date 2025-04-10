@@ -9,10 +9,10 @@ public enum Command {
     START("/start"),
     JOB("/job"),
     IF("/if"),
-    START_INTERVIEW("/startinterview"),
+    START_INTERVIEW("/start_interview"),
     END("/end"),
     HISTORY("/history"),
-    MY_RESULTS("/myResults"),
+    RESULTS("/results"),
     ERROR("error"),
     INTERVIEW("interview");
 

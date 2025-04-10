@@ -23,17 +23,15 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
     private static final String JOB_ERROR_MESSAGE = "Произошла ошибка! Вы должны указать должность при помощи команды: /job";
     private static final String ERROR_MESSAGE = "Произошла ошибка! Пользователь не найден!";
 
+    private static final String AI_REQUEST_MESSAGE = "Ты проводишь собеседование на должность: %s\n" +
+            "Начинай сразу с приветствия и первого вопроса. " +
+            "Вопросы задавай по одному, после ответа переходи к следующему вопросу." +
+            "\nНе обсуждай с пользователем сторонние темы. Не дай ему отойти от темы собеседования." +
+            "Ты не ИИ, ты профессиональый ревьюер с опытом в соответствующей сфере ." +
+            "Дополнительные условия следующие:";
+
     @Override
     public void handle(Update update, UserEntity userEntity) {
-        String aiRequestMessage = String.format(
-                "Ты проводишь собеседование на должность: %s\n" +
-                        "Начинай сразу с приветствия и первого вопроса. " +
-                        "Вопросы задавай по одному, после ответа переходи к следующему вопросу." +
-                        "\nНе обсуждай с пользователем сторонние темы. Не дай ему отойти от темы собеседования." +
-                        "Ты не ИИ, ты профессиональый ревьюер с опытом разработчика." +
-                        "Дополнительные условия следующие:"
-        , userEntity.getJobTittle(), userEntity.getProperties());
-
         Message requestMessage = update.getMessage();
         Long chatId = requestMessage.getChatId();
 
@@ -41,6 +39,8 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
             telegramService.sendReturnedMessage(chatId, JOB_ERROR_MESSAGE);
             return;
         }
+        String aiRequestMessage = String.format(AI_REQUEST_MESSAGE,
+                userEntity.getJobTittle(), userEntity.getProperties());
 
         TelegramUser telegramUser = telegramUserService.setBotStateByIdOrGetNull(
                 userEntity.getTelegramUserId(), BotState.INTERVIEW);

@@ -26,13 +26,13 @@ public class IfUpdateHandler implements UpdateHandler {
         String[] splitted = requestMessage.getText().split(TelegramBot.DELIMITER);
         String properties = splitted[1];
 
-        UserEntity user = userService.setPropertiesOrGetNull(userEntity.getId(), properties);
+        userEntity = userService.setPropertiesOrGetNull(userEntity, properties);
 
-        if (user == null) {
+        if (userEntity == null) {
             telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
         } else {
             telegramService.sendReturnedMessage(
-                    chatId, SUCCESS_MESSAGE + user.getProperties());
+                    chatId, SUCCESS_MESSAGE + userEntity.getProperties());
         }
     }
 

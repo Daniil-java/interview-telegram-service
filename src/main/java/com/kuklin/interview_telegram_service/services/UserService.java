@@ -40,16 +40,12 @@ public class UserService {
         }
     }
 
-    public UserEntity setJobTittleOrGetNull(Long userId, String jobTittle) {
-        UserEntity userEntity = userRepository.findById(userId).orElse(null);
-        if (userEntity == null) return null;
-        return userRepository.save(userEntity.setJobTittle(jobTittle));
+    public UserEntity setJobTittleOrGetNull(UserEntity user, String jobTittle) {
+        return userRepository.save(user.setJobTittle(jobTittle));
     }
 
-    public UserEntity setPropertiesOrGetNull(Long userId, String properties) {
-        UserEntity userEntity = userRepository.findById(userId).orElse(null);
-        if (userEntity == null) return null;
-        return userRepository.save(userEntity.setJobTittle(properties));
+    public UserEntity setPropertiesOrGetNull(UserEntity user, String properties) {
+        return userRepository.save(user.setJobTittle(properties));
     }
 
 }
