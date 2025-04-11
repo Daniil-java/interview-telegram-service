@@ -28,7 +28,7 @@ public class JobUpdateHandler implements UpdateHandler {
             "является ли следующая строка должна являться должностью, " +
             "на которую можно провести собеседование. Ответ должен быть однозначным," +
             " не пиши ничего лишнего, только 1 - если является, и 0 - если нет;\n" +
-            "Строка: ";
+            "Строка: %s";
 
     @Override
     public void handle(Update update, UserEntity userEntity) {
@@ -40,7 +40,7 @@ public class JobUpdateHandler implements UpdateHandler {
 
         Long conversationId = openAiIntegrationService.getNewConversationId();
         MessageResponseDto response =
-                openAiIntegrationService.sendMessage(AI_REQUEST_MESSAGE + jobTittle, conversationId);
+                openAiIntegrationService.sendMessage(String.format(AI_REQUEST_MESSAGE, jobTittle), conversationId);
 
         if (response.getContent().equals("0")) {
             telegramService.sendReturnedMessage(chatId, JOB_ERROR_MESSAGE);

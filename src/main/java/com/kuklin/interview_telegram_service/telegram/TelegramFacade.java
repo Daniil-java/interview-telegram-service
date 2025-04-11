@@ -37,7 +37,7 @@ public class TelegramFacade {
          На этапе разработки обработка сообщений
          происходит только от одного пользователя
          */
-        if (!update.hasCallbackQuery() && update.hasMessage()) return;
+        if (!update.hasCallbackQuery() && !update.hasMessage()) return;
         User user = update.getMessage() != null ?
                 update.getMessage().getFrom() :
                 update.getCallbackQuery().getFrom();
