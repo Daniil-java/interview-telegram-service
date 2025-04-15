@@ -1,4 +1,4 @@
-package com.kuklin.interview_telegram_service.telegram.utils;
+package com.kuklin.interview_telegram_service.models.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class TelegramUser {
     @Id
-    @Column(name = "telegram_id")
     private Long telegramId;
     private String username;
     private String firstname;

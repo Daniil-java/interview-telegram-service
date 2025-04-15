@@ -21,9 +21,8 @@ public class UserEntity {
     private Long id;
     private String name;
     private BigDecimal balance;
-    @Column(name = "telegram_id")
-    private Long telegramUserId;
-    private String jobTittle;
+    private Long telegramId;
+    private String jobTitle;
     private String properties;
     @UpdateTimestamp
     private LocalDateTime updated;

@@ -49,7 +49,7 @@ public class TelegramFacade {
 
     public UpdateHandler processInputUpdate(Update update, UserEntity userEntity) {
         String request;
-        TelegramUser telegramUser = telegramUserService.getTelegramUserByIdOrNull(userEntity.getTelegramUserId());
+        TelegramUser telegramUser = telegramUserService.getTelegramUserByIdOrNull(userEntity.getTelegramId());
         if (update.hasCallbackQuery()) {
             request = update.getCallbackQuery().getData();
         } else {

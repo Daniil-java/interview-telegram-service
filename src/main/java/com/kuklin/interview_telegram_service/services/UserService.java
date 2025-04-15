@@ -17,7 +17,7 @@ public class UserService {
     private final TelegramUserService telegramUserService;
 
     public UserEntity getUserByTelegramIdOrNull(Long telegramId) {
-        return userRepository.findUserEntityByTelegramUserId(telegramId)
+        return userRepository.findUserEntityByTelegramId(telegramId)
                 .orElse(null);
     }
 
@@ -26,7 +26,7 @@ public class UserService {
 
         UserEntity user = new UserEntity()
                 .setName(telegramUser.getUserName())
-                .setTelegramUserId(tgUser.getTelegramId());
+                .setTelegramId(tgUser.getTelegramId());
 
         return userRepository.save(user);
     }
@@ -41,11 +41,11 @@ public class UserService {
     }
 
     public UserEntity setJobTittleOrGetNull(UserEntity user, String jobTittle) {
-        return userRepository.save(user.setJobTittle(jobTittle));
+        return userRepository.save(user.setJobTitle(jobTittle));
     }
 
     public UserEntity setPropertiesOrGetNull(UserEntity user, String properties) {
-        return userRepository.save(user.setJobTittle(properties));
+        return userRepository.save(user.setJobTitle(properties));
     }
 
 }

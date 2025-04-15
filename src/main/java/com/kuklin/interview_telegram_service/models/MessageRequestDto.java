@@ -1,6 +1,6 @@
 package com.kuklin.interview_telegram_service.models;
 
-import com.kuklin.interview_telegram_service.telegram.utils.ChatModel;
+import com.kuklin.interview_telegram_service.models.enums.ChatModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
