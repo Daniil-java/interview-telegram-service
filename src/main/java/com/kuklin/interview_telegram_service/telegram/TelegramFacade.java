@@ -44,6 +44,7 @@ public class TelegramFacade {
         if (user.getId() != 425120436L) return;
 
         UserEntity userEntity = userService.getOrCreateUser(user);
+
         processInputUpdate(update, userEntity).handle(update, userEntity);
     }
 

@@ -3,7 +3,6 @@ package com.kuklin.interview_telegram_service.telegram.handlers.interview;
 import com.kuklin.interview_telegram_service.entities.ChatMessage;
 import com.kuklin.interview_telegram_service.entities.TelegramUser;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
-import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
 import com.kuklin.interview_telegram_service.models.MessageRequestDto;
 import com.kuklin.interview_telegram_service.services.*;
 import com.kuklin.interview_telegram_service.telegram.handlers.UpdateHandler;
@@ -22,7 +21,7 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
     private final ChatMessageService chatMessageService;
     private final ConversationService conversationService;
     private static final String JOB_ERROR_MESSAGE = "Произошла ошибка! Вы должны указать должность при помощи команды: /job";
-    private static final String ERROR_MESSAGE = "Произошла ошибка! Пользователь не найден!";
+    private static final String ERROR_MESSAGE = "Произошла ошибка! Попробуйте обратиться позже!";
 
     private static final String AI_REQUEST_MESSAGE = "Ты проводишь собеседование на должность: %s\n" +
             "Начинай сразу с приветствия и первого вопроса. " +
@@ -59,10 +58,8 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
                     MessageRequestDto.getDefault(aiRequestMessage, conversationId)
                     , userEntity);
             response = chatMessage.getContent();
-        } catch (NullPointerException e) {
-            response = "Не получилось найти беседу";
-        } catch (ErrorResponseException e) {
-            response = e.getErrorStatus().getMessage();
+        } catch (Exception e) {
+            response = ERROR_MESSAGE;
         }
 
         telegramUserService.setActualConversationIdOrGetNull(

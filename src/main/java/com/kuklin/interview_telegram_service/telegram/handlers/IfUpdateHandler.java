@@ -3,7 +3,6 @@ package com.kuklin.interview_telegram_service.telegram.handlers;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
 import com.kuklin.interview_telegram_service.services.TelegramService;
 import com.kuklin.interview_telegram_service.services.UserService;
-import com.kuklin.interview_telegram_service.telegram.TelegramBot;
 import com.kuklin.interview_telegram_service.telegram.utils.Command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,17 +22,13 @@ public class IfUpdateHandler implements UpdateHandler {
         Message requestMessage = update.getMessage();
         Long chatId = requestMessage.getChatId();
 
-        String[] splitted = requestMessage.getText().split(TelegramBot.DELIMITER);
-        String properties = splitted[1];
+        String properties = requestMessage.getText().substring(
+                getHandlerListName().length());
 
-        userEntity = userService.setPropertiesOrGetNull(userEntity, properties);
+        userEntity = userService.save(userEntity.setProperties(properties));
 
-        if (userEntity == null) {
-            telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
-        } else {
-            telegramService.sendReturnedMessage(
-                    chatId, SUCCESS_MESSAGE + userEntity.getProperties());
-        }
+        telegramService.sendReturnedMessage(
+                chatId, SUCCESS_MESSAGE + userEntity.getProperties());
     }
 
     @Override

@@ -2,8 +2,8 @@ package com.kuklin.interview_telegram_service.telegram.handlers;
 
 import com.kuklin.interview_telegram_service.entities.UserEntity;
 import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
+import com.kuklin.interview_telegram_service.models.MessageRequestDto;
 import com.kuklin.interview_telegram_service.services.*;
-import com.kuklin.interview_telegram_service.telegram.TelegramBot;
 import com.kuklin.interview_telegram_service.telegram.utils.Command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,11 +35,15 @@ public class JobUpdateHandler implements UpdateHandler {
         Long chatId = requestMessage.getChatId();
         String response;
 
-        String[] splitted = requestMessage.getText().split(TelegramBot.DELIMITER);
-        String jobTittle = splitted[1];
+        String jobTittle = requestMessage.getText().substring(
+                getHandlerListName().length());
 
         try {
-            response = chatMessageService.sendDaemonMessage(String.format(AI_REQUEST_MESSAGE, jobTittle));
+            MessageRequestDto messageRequestDto =
+                    MessageRequestDto.getServiceMessage(
+                            String.format(AI_REQUEST_MESSAGE, jobTittle));
+
+            response = chatMessageService.sendServiceMessage(userEntity, messageRequestDto);
         } catch (ErrorResponseException e) {
             telegramService.sendReturnedMessage(chatId, e.getErrorStatus().getMessage());
             return;
@@ -50,13 +54,11 @@ public class JobUpdateHandler implements UpdateHandler {
             return;
         }
 
-        userEntity = userService.setJobTittleOrGetNull(userEntity, jobTittle);
+        userEntity = userService.save(userEntity.setJobTitle(jobTittle));
 
-        if (userEntity == null) {
-            telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
-        } else {
-            telegramService.sendReturnedMessage(chatId, SUCCESS_MESSAGE + userEntity.getJobTitle());
-        }
+        telegramService.sendReturnedMessage(
+                chatId, SUCCESS_MESSAGE + userEntity.getJobTitle());
+
     }
 
     @Override

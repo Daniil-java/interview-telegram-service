@@ -2,6 +2,7 @@ package com.kuklin.interview_telegram_service.models.openai;
 
 import com.kuklin.interview_telegram_service.entities.ChatMessage;
 import com.kuklin.interview_telegram_service.entities.Model;
+import com.kuklin.interview_telegram_service.models.enums.ChatModel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -29,10 +30,9 @@ public class OpenAiChatCompletionRequest {
     public static OpenAiChatCompletionRequest makeDefaultRequest(
             String content) {
 
-        String modelName = "gpt-4o";
         return new OpenAiChatCompletionRequest()
                 .setTemperature(TEMPERATURE_DEFAULT)
-                .setModel(modelName)
+                .setModel(ChatModel.GPT4O.getModel())
                 .setMessages(Message.getFirstMessage(content));
     }
 

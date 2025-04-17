@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS telegram_users (
 CREATE TABLE IF NOT EXISTS users (
                                      id SERIAL PRIMARY KEY,
                                      name TEXT,
-                                     balance DECIMAL,
+                                     balance DECIMAL DEFAULT 0,
                                      telegram_id BIGINT,
                                      job_title TEXT,
                                      properties TEXT,
@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     conversation_id INTEGER REFERENCES conversations(id),
     model_id INTEGER REFERENCES models(id),
     native_tokens_sum DECIMAL,
-    general_tokens_sum DECIMAL
+    general_tokens_sum DECIMAL,
+    is_service_message BOOL default false
     );
 
 CREATE INDEX idx_role ON chat_messages(role);

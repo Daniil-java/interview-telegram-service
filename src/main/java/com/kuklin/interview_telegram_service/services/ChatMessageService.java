@@ -8,7 +8,6 @@ import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
 import com.kuklin.interview_telegram_service.exceptions.ErrorStatus;
 import com.kuklin.interview_telegram_service.models.AiResponse;
 import com.kuklin.interview_telegram_service.models.MessageRequestDto;
-import com.kuklin.interview_telegram_service.models.MessageResponseDto;
 import com.kuklin.interview_telegram_service.models.enums.MessageStatus;
 import com.kuklin.interview_telegram_service.repositories.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +25,21 @@ public class ChatMessageService {
     private final ConversationService conversationService;
     private final ModelService modelService;
     private final OpenAiIntegrationService openAiIntegrationService;
+    private final UserService userService;
+    private static final String SERVICE_CONV = "SERVICE MESSAGE";
 
-    public String sendDaemonMessage(String content) throws ErrorResponseException {
+    public String sendServiceMessage(UserEntity user, MessageRequestDto messageRequestDto) throws ErrorResponseException {
+        Conversation conversation = conversationService.getNewConversation(user, SERVICE_CONV);
+        Model model = modelService.findModelOrThrowError(messageRequestDto.getModel());
+
+        ChatMessage userMessage = ChatMessage
+                .newUserMessage(messageRequestDto, conversation, model)
+                .setServiceMessage(true)
+                .setConversation(conversation);
+        chatMessageRepository.save(userMessage);
+
         try {
-            return openAiIntegrationService.fetchDaemonResponse(content);
+            return openAiIntegrationService.fetchResponse(userMessage, null).getContent();
         } catch (Exception e) {
             log.error("AI Connection error!");
             throw new ErrorResponseException(ErrorStatus.AI_CONNECTION_ERROR);
@@ -64,11 +72,10 @@ public class ChatMessageService {
             );
 
             userMessage.setStatus(MessageStatus.DONE);
-            //Вычитание токенов с баланса пользователя
-            user.setBalance(user.getBalance()
-                    .subtract(assistantMessage.getInputToken()
-                            .add(assistantMessage.getOutputToken()))
-            );
+            //Вычитание токенов с баланса пользователя, если сообщение не является служебным
+            userService.subtractBalance(user, assistantMessage.getInputToken()
+                    .add(assistantMessage.getOutputToken()));
+
             chatMessageRepository.save(userMessage);
 
             assistantMessage.setStatus(MessageStatus.DONE);

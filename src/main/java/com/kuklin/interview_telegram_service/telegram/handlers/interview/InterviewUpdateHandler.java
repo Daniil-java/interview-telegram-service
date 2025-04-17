@@ -3,7 +3,6 @@ package com.kuklin.interview_telegram_service.telegram.handlers.interview;
 import com.kuklin.interview_telegram_service.entities.ChatMessage;
 import com.kuklin.interview_telegram_service.entities.TelegramUser;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
-import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
 import com.kuklin.interview_telegram_service.models.MessageRequestDto;
 import com.kuklin.interview_telegram_service.services.ChatMessageService;
 import com.kuklin.interview_telegram_service.services.TelegramService;
@@ -20,6 +19,7 @@ public class InterviewUpdateHandler implements UpdateHandler {
     private final TelegramService telegramService;
     private final TelegramUserService telegramUserService;
     private final ChatMessageService chatMessageService;
+    private static final String ERROR_MESSAGE = "Ошибка! Попробуйте продолжить собеседование позже";
     @Override
     public void handle(Update update, UserEntity userEntity) {
         Message requestMessage = update.getMessage();
@@ -32,10 +32,8 @@ public class InterviewUpdateHandler implements UpdateHandler {
             ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
                     MessageRequestDto.getDefault(update.getMessage().getText(), telegramUser.getActualAiConversationId()), userEntity);
             response = chatMessage.getContent();
-        } catch (NullPointerException e) {
-            response = "Не получилось найти беседу";
-        } catch (ErrorResponseException e) {
-            response = e.getErrorStatus().getMessage();
+        } catch (Exception e) {
+            response = ERROR_MESSAGE;
         }
 
         telegramService.sendReturnedMessage(chatId, response);

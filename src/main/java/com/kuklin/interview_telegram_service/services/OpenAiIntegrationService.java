@@ -25,23 +25,18 @@ public class OpenAiIntegrationService {
     }
 
     public AiResponse fetchResponse(ChatMessage userMessage, List<ChatMessage> chatMessageList) {
-        OpenAiChatCompletionRequest request = OpenAiChatCompletionRequest.makeRequest(
-                chatMessageList, userMessage.getModel(), userMessage.getTemperature());
+        OpenAiChatCompletionRequest request;
+        if (chatMessageList == null) {
+            request = OpenAiChatCompletionRequest.makeDefaultRequest(userMessage.getContent());
+        } else {
+            request = OpenAiChatCompletionRequest.makeRequest(
+                    chatMessageList, userMessage.getModel(), userMessage.getTemperature());
+        }
 
         OpenAiChatCompletionResponse response =
                 openAiFeignClient.generate("Bearer " + aiKey, request);
 
         return response.toAiResponse(userMessage.getModel());
-    }
-
-    public String fetchDaemonResponse(String content) {
-        OpenAiChatCompletionRequest request = OpenAiChatCompletionRequest
-                .makeDefaultRequest(content);
-
-        OpenAiChatCompletionResponse response =
-                openAiFeignClient.generate("Bearer " + aiKey, request);
-
-        return response.getContent();
     }
 
     public ProviderVariant getProviderName() {

@@ -3,7 +3,6 @@ package com.kuklin.interview_telegram_service.telegram.handlers.interview;
 import com.kuklin.interview_telegram_service.entities.ChatMessage;
 import com.kuklin.interview_telegram_service.entities.TelegramUser;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
-import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
 import com.kuklin.interview_telegram_service.models.MessageRequestDto;
 import com.kuklin.interview_telegram_service.services.ChatMessageService;
 import com.kuklin.interview_telegram_service.services.TelegramService;
@@ -45,12 +44,9 @@ public class EndInterviewUpdateHandler implements UpdateHandler {
             ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
                     MessageRequestDto.getDefault(AI_REQUEST_MESSAGE, conversationId), userEntity);
             response = chatMessage.getContent();
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             response = ERROR_MESSAGE;
-        } catch (ErrorResponseException e) {
-            response = e.getErrorStatus().getMessage();
         }
-
 
         telegramService.sendReturnedMessage(chatId, response);
     }

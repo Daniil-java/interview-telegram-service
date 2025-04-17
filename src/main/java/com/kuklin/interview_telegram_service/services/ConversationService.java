@@ -18,6 +18,13 @@ public class ConversationService {
         return conversationRepository.save(new Conversation().setUser(user));
     }
 
+    public Conversation getNewConversation(UserEntity user, String conversationName) {
+        return conversationRepository.save(
+                new Conversation()
+                        .setUser(user)
+                        .setName(conversationName));
+    }
+
     public Conversation getByIdOrGetNull(Long id) {
         return conversationRepository.findById(id).orElse(null);
     }

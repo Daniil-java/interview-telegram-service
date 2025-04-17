@@ -21,4 +21,10 @@ public class MessageRequestDto {
                 .setConversationId(conversationId)
                 .setModel(ChatModel.GPT4O);
     }
+
+    public static MessageRequestDto getServiceMessage(String content) {
+        return new MessageRequestDto()
+                .setContent(String.format(content))
+                .setModel(ChatModel.GPT4O);
+    }
 }

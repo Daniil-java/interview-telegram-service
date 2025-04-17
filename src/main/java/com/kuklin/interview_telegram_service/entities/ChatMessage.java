@@ -42,6 +42,7 @@ public class ChatMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id")
     private Conversation conversation;
+    private boolean isServiceMessage;
     private OffsetDateTime created;
 
     public static ChatMessage newUserMessage(
@@ -53,7 +54,8 @@ public class ChatMessage {
                 .setStatus(MessageStatus.NEW)
                 .setModel(model)
                 .setTemperature(messageRequestDto.getTemperature())
-                .setConversation(conversation);
+                .setConversation(conversation)
+                .setServiceMessage(false);
     }
 
     public static ChatMessage newAssistantMessage(AiResponse response,
@@ -74,6 +76,7 @@ public class ChatMessage {
                 .setGeneralTokensSum(generalTokensSum)
                 .setTemperature(0f)
                 .setModel(userMessage.getModel())
+                .setServiceMessage(false)
                 ;
     }
 }
