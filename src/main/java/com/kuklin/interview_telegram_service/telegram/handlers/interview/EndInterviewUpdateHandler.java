@@ -1,9 +1,10 @@
 package com.kuklin.interview_telegram_service.telegram.handlers.interview;
 
+import com.kuklin.interview_telegram_service.entities.ChatMessage;
 import com.kuklin.interview_telegram_service.entities.TelegramUser;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
-import com.kuklin.interview_telegram_service.models.MessageResponseDto;
-import com.kuklin.interview_telegram_service.services.OpenAiIntegrationService;
+import com.kuklin.interview_telegram_service.models.MessageRequestDto;
+import com.kuklin.interview_telegram_service.services.ChatMessageService;
 import com.kuklin.interview_telegram_service.services.TelegramService;
 import com.kuklin.interview_telegram_service.services.TelegramUserService;
 import com.kuklin.interview_telegram_service.telegram.handlers.UpdateHandler;
@@ -19,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class EndInterviewUpdateHandler implements UpdateHandler {
     private final TelegramService telegramService;
     private final TelegramUserService telegramUserService;
-    private final OpenAiIntegrationService openAiIntegrationService;
+    private final ChatMessageService chatMessageService;
     private static final String ERROR_MESSAGE = "Произошла ошибка! Не получилось закончить собеседование!";
     private static final String AI_REQUEST_MESSAGE = "Собеседование закончено. " +
             "Проанализируй ответы. Расскажи об ошибках. " +
@@ -30,7 +31,7 @@ public class EndInterviewUpdateHandler implements UpdateHandler {
         Long chatId = requestMessage.getChatId();
 
         TelegramUser telegramUser = telegramUserService.setBotStateByIdOrGetNull(
-                userEntity.getTelegramUserId(), BotState.WAIT);
+                userEntity.getTelegramId(), BotState.WAIT);
 
         if (telegramUser == null) {
             telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
@@ -38,10 +39,16 @@ public class EndInterviewUpdateHandler implements UpdateHandler {
         }
 
         Long conversationId = telegramUser.getActualAiConversationId();
-        MessageResponseDto messageResponseDto =
-                openAiIntegrationService.sendMessage(AI_REQUEST_MESSAGE, conversationId);
+        String response;
+        try {
+            ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
+                    MessageRequestDto.getDefault(AI_REQUEST_MESSAGE, conversationId), userEntity);
+            response = chatMessage.getContent();
+        } catch (Exception e) {
+            response = ERROR_MESSAGE;
+        }
 
-        telegramService.sendReturnedMessage(chatId, messageResponseDto.getContent());
+        telegramService.sendReturnedMessage(chatId, response);
     }
 
     @Override

@@ -1,11 +1,9 @@
 package com.kuklin.interview_telegram_service.telegram.handlers;
 
 import com.kuklin.interview_telegram_service.entities.UserEntity;
-import com.kuklin.interview_telegram_service.models.MessageResponseDto;
-import com.kuklin.interview_telegram_service.services.OpenAiIntegrationService;
-import com.kuklin.interview_telegram_service.services.TelegramService;
-import com.kuklin.interview_telegram_service.services.UserService;
-import com.kuklin.interview_telegram_service.telegram.TelegramBot;
+import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
+import com.kuklin.interview_telegram_service.models.MessageRequestDto;
+import com.kuklin.interview_telegram_service.services.*;
 import com.kuklin.interview_telegram_service.telegram.utils.Command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +16,8 @@ public class JobUpdateHandler implements UpdateHandler {
 
     private final TelegramService telegramService;
     private final UserService userService;
-    private final OpenAiIntegrationService openAiIntegrationService;
+    private final ChatMessageService chatMessageService;
+    private final ConversationService conversationService;
     private static final String JOB_ERROR_MESSAGE = "Произошла ошибка! Введите существующую должность.";
 
     private static final String ERROR_MESSAGE = "Произошла ошибка! Не получилось сохранить новую должность:";
@@ -34,26 +33,32 @@ public class JobUpdateHandler implements UpdateHandler {
     public void handle(Update update, UserEntity userEntity) {
         Message requestMessage = update.getMessage();
         Long chatId = requestMessage.getChatId();
+        String response;
 
-        String[] splitted = requestMessage.getText().split(TelegramBot.DELIMITER);
-        String jobTittle = splitted[1];
+        String jobTittle = requestMessage.getText().substring(
+                getHandlerListName().length());
 
-        Long conversationId = openAiIntegrationService.getNewConversationId();
-        MessageResponseDto response =
-                openAiIntegrationService.sendMessage(String.format(AI_REQUEST_MESSAGE, jobTittle), conversationId);
+        try {
+            MessageRequestDto messageRequestDto =
+                    MessageRequestDto.getServiceMessage(
+                            String.format(AI_REQUEST_MESSAGE, jobTittle));
 
-        if (response.getContent().equals("0")) {
+            response = chatMessageService.sendServiceMessage(userEntity, messageRequestDto);
+        } catch (ErrorResponseException e) {
+            telegramService.sendReturnedMessage(chatId, e.getErrorStatus().getMessage());
+            return;
+        }
+
+        if (response.equals("0")) {
             telegramService.sendReturnedMessage(chatId, JOB_ERROR_MESSAGE);
             return;
         }
 
-        userEntity = userService.setJobTittleOrGetNull(userEntity, jobTittle);
+        userEntity = userService.save(userEntity.setJobTitle(jobTittle));
 
-        if (userEntity == null) {
-            telegramService.sendReturnedMessage(chatId, ERROR_MESSAGE);
-        } else {
-            telegramService.sendReturnedMessage(chatId, SUCCESS_MESSAGE + userEntity.getJobTittle());
-        }
+        telegramService.sendReturnedMessage(
+                chatId, SUCCESS_MESSAGE + userEntity.getJobTitle());
+
     }
 
     @Override

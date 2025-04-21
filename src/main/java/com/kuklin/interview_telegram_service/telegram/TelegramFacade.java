@@ -44,12 +44,13 @@ public class TelegramFacade {
         if (user.getId() != 425120436L) return;
 
         UserEntity userEntity = userService.getOrCreateUser(user);
+
         processInputUpdate(update, userEntity).handle(update, userEntity);
     }
 
     public UpdateHandler processInputUpdate(Update update, UserEntity userEntity) {
         String request;
-        TelegramUser telegramUser = telegramUserService.getTelegramUserByIdOrNull(userEntity.getTelegramUserId());
+        TelegramUser telegramUser = telegramUserService.getTelegramUserByIdOrNull(userEntity.getTelegramId());
         if (update.hasCallbackQuery()) {
             request = update.getCallbackQuery().getData();
         } else {

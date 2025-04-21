@@ -1,6 +1,6 @@
 package com.kuklin.interview_telegram_service.models;
 
-import com.kuklin.interview_telegram_service.telegram.utils.ChatModel;
+import com.kuklin.interview_telegram_service.models.enums.ChatModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -19,6 +19,12 @@ public class MessageRequestDto {
         return new MessageRequestDto()
                 .setContent(content)
                 .setConversationId(conversationId)
+                .setModel(ChatModel.GPT4O);
+    }
+
+    public static MessageRequestDto getServiceMessage(String content) {
+        return new MessageRequestDto()
+                .setContent(String.format(content))
                 .setModel(ChatModel.GPT4O);
     }
 }

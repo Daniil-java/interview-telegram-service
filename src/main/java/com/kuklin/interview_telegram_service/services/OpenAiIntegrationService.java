@@ -1,26 +1,46 @@
 package com.kuklin.interview_telegram_service.services;
 
-import com.kuklin.interview_telegram_service.integrations.OpenAIServiceFeignClient;
-import com.kuklin.interview_telegram_service.models.ConversationDto;
-import com.kuklin.interview_telegram_service.models.MessageRequestDto;
-import com.kuklin.interview_telegram_service.models.MessageResponseDto;
-import lombok.RequiredArgsConstructor;
+import com.kuklin.interview_telegram_service.entities.ChatMessage;
+import com.kuklin.interview_telegram_service.integrations.OpenAiFeignClient;
+import com.kuklin.interview_telegram_service.models.AiResponse;
+import com.kuklin.interview_telegram_service.models.enums.ProviderVariant;
+import com.kuklin.interview_telegram_service.models.openai.OpenAiChatCompletionRequest;
+import com.kuklin.interview_telegram_service.models.openai.OpenAiChatCompletionResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class OpenAiIntegrationService {
 
-    private final OpenAIServiceFeignClient openAIServiceFeignClient;
+    private final OpenAiFeignClient openAiFeignClient;
+    private final String aiKey;
 
-    public MessageResponseDto sendMessage(String content, Long conversationId) {
-        return openAIServiceFeignClient.sendMessage(
-                MessageRequestDto.getDefault(content, conversationId));
+    public OpenAiIntegrationService(@Value("${GENERATION_TOKEN}") String aiKey, OpenAiFeignClient openAiFeignClient) {
+        this.aiKey = aiKey;
+        this.openAiFeignClient = openAiFeignClient;
     }
 
-    public Long getNewConversationId() {
-        return openAIServiceFeignClient.createNewConversation(new ConversationDto()).getId();
+    public AiResponse fetchResponse(ChatMessage userMessage, List<ChatMessage> chatMessageList) {
+        OpenAiChatCompletionRequest request;
+        if (chatMessageList == null) {
+            request = OpenAiChatCompletionRequest.makeDefaultRequest(userMessage.getContent());
+        } else {
+            request = OpenAiChatCompletionRequest.makeRequest(
+                    chatMessageList, userMessage.getModel(), userMessage.getTemperature());
+        }
+
+        OpenAiChatCompletionResponse response =
+                openAiFeignClient.generate("Bearer " + aiKey, request);
+
+        return response.toAiResponse(userMessage.getModel());
     }
+
+    public ProviderVariant getProviderName() {
+        return ProviderVariant.OPENAI;
+    }
+
 }

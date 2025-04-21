@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -17,7 +19,7 @@ public class UserService {
     private final TelegramUserService telegramUserService;
 
     public UserEntity getUserByTelegramIdOrNull(Long telegramId) {
-        return userRepository.findUserEntityByTelegramUserId(telegramId)
+        return userRepository.findUserEntityByTelegramId(telegramId)
                 .orElse(null);
     }
 
@@ -26,7 +28,8 @@ public class UserService {
 
         UserEntity user = new UserEntity()
                 .setName(telegramUser.getUserName())
-                .setTelegramUserId(tgUser.getTelegramId());
+                .setTelegramId(tgUser.getTelegramId())
+                .setBalance(BigDecimal.ZERO);
 
         return userRepository.save(user);
     }
@@ -40,12 +43,12 @@ public class UserService {
         }
     }
 
-    public UserEntity setJobTittleOrGetNull(UserEntity user, String jobTittle) {
-        return userRepository.save(user.setJobTittle(jobTittle));
+    public UserEntity subtractBalance(UserEntity user, BigDecimal subtractTokens) {
+        return userRepository.save(user.setBalance(user.getBalance().subtract(subtractTokens)));
     }
 
-    public UserEntity setPropertiesOrGetNull(UserEntity user, String properties) {
-        return userRepository.save(user.setJobTittle(properties));
+    public UserEntity save(UserEntity user) {
+        return userRepository.save(user);
     }
 
 }
