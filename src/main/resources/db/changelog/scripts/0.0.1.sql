@@ -66,6 +66,18 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     is_service_message BOOL default false
     );
 
+CREATE TABLE IF NOT EXISTS interviews (
+    id SERIAL PRIMARY KEY,
+    job_tittle TEXT,
+    result TEXT,
+    conversation_id INTEGER REFERENCES conversations(id),
+    user_id INTEGER REFERENCES users(id),
+    properties TEXT,
+    updated TIMESTAMP,
+    created TIMESTAMP DEFAULT current_timestamp
+    );
+
+
 CREATE INDEX idx_role ON chat_messages(role);
 CREATE INDEX idx_message_type ON chat_messages(message_type);
 CREATE INDEX idx_created ON chat_messages(created);
