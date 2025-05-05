@@ -15,7 +15,7 @@ public class ConversationService {
     private final ConversationRepository conversationRepository;
 
     public Conversation getNewConversation(UserEntity user) {
-        return conversationRepository.save(new Conversation().setUser(user));
+        return getNewConversation(user, null);
     }
 
     public Conversation getNewConversation(UserEntity user, String conversationName) {

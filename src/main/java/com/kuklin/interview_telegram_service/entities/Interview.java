@@ -20,7 +20,13 @@ public class Interview {
     private Long id;
     private String jobTittle;
     private String result;
-    private String analysis;
+    @OneToOne
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+    private String properties;
     @UpdateTimestamp
     private LocalDateTime updated;
     @CreationTimestamp

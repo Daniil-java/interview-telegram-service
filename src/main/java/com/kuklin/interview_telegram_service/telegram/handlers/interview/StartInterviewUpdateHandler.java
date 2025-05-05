@@ -20,6 +20,7 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
     private final TelegramUserService telegramUserService;
     private final ChatMessageService chatMessageService;
     private final ConversationService conversationService;
+    private final InterviewService interviewService;
     private static final String JOB_ERROR_MESSAGE = "Произошла ошибка! Вы должны указать должность при помощи команды: /job";
     private static final String ERROR_MESSAGE = "Произошла ошибка! Попробуйте обратиться позже!";
 
@@ -55,8 +56,8 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
 
         try {
             ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
-                    MessageRequestDto.getDefault(aiRequestMessage, conversationId)
-                    , userEntity);
+                    MessageRequestDto.getDefault(aiRequestMessage, conversationId),
+                    userEntity);
             response = chatMessage.getContent();
         } catch (Exception e) {
             response = ERROR_MESSAGE;
@@ -66,6 +67,8 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
                 telegramUser.getTelegramId(), conversationId);
 
         telegramService.sendReturnedMessage(chatId, response);
+
+        interviewService.saveInterview(conversationId, userEntity);
 
     }
 
