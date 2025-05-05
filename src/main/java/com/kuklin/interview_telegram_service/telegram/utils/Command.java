@@ -15,6 +15,5 @@ public enum Command {
     RESULTS("/results"),
     ERROR("error"),
     INTERVIEW("interview");
-
     private final String commandText;
 }

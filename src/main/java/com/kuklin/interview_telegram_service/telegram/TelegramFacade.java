@@ -56,7 +56,12 @@ public class TelegramFacade {
         } else {
             request = update.getMessage().getText();
         }
-        UpdateHandler currentUpdateHandler = updateHandlerMap.get(request.split(TelegramBot.DELIMITER)[0]);
+
+
+        UpdateHandler currentUpdateHandler = null;
+        if (request != null) {
+            currentUpdateHandler = updateHandlerMap.get(request.split(TelegramBot.DELIMITER)[0]);
+        }
         if (currentUpdateHandler != null) {
             return currentUpdateHandler;
         } else if (telegramUser.getBotState() == BotState.WAIT) {
