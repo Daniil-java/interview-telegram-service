@@ -37,11 +37,10 @@ public class InterviewService {
     }
 
     public Interview saveResult(UserEntity userEntity, Long conversationId, String response) {
-        Conversation conversation = conversationService.getByIdOrGetNull(conversationId);
         Interview interview = interviewRepository
                 .findInterviewByConversation_Id(conversationId).orElse(null);
 
-        if (conversation == null || interview == null) {
+        if (interview == null) {
             log.error("Failed to save conversation!");
             return null;
         }
