@@ -21,10 +21,12 @@ public class TelegramBot extends TelegramLongPollingBot {
     private String botName;
     @Autowired
     private TelegramFacade telegramFacade;
+    private String botToken;
 
 
     public TelegramBot(TelegramBotKeyComponent telegramBotKeyComponent) {
         super(telegramBotKeyComponent.getKey());
+        botToken = telegramBotKeyComponent.getKey();
     }
 
     @Override
@@ -40,12 +42,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendVoiceMessage(SendVoice message) {
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Send message error!", e);
-        }
+    public void sendVoiceMessage(SendVoice message) throws TelegramApiException{
+        execute(message);
     }
 
     public Message sendReturnedMessage(SendMessage sendMessage) {
@@ -60,5 +58,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return botName;
+    }
+
+    public String getToken() {
+        return botToken;
     }
 }

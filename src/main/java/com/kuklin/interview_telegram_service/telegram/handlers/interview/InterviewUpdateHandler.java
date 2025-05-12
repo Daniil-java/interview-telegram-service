@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 @Component
 @RequiredArgsConstructor
 public class InterviewUpdateHandler implements UpdateHandler {
@@ -23,6 +25,7 @@ public class InterviewUpdateHandler implements UpdateHandler {
     private final OpenAiIntegrationService openAiIntegrationService;
     private static final String ERROR_MESSAGE = "Ошибка! Попробуйте продолжить собеседование позже";
     private static final String VOICE_ERROR_MESSAGE = "Ошибка! Не получилось обработать голосовое сообщение";
+    private static final String VOICE_ERROR_RESPONSE_MESSAGE = "Ошибка! Не получилось отправить голосовое сообщение";
 
     @Override
     public void handle(Update update, UserEntity userEntity) {
@@ -33,15 +36,27 @@ public class InterviewUpdateHandler implements UpdateHandler {
         String request = requestMessage.getText();
 
         if (requestMessage.hasVoice()) {
-            String fileId = requestMessage.getVoice().getFileId();
-            byte[] inputAudioFile = telegramService.downloadFileOrNull(fileId);
-            if (inputAudioFile == null) {
+            request = processVoidMessage(requestMessage);
+            if (request == null) {
                 telegramService.sendReturnedMessage(chatId, VOICE_ERROR_MESSAGE);
-                return;
             }
-            request = openAiIntegrationService.fetchAudioResponse(inputAudioFile);
         }
 
+        String response = getResponseMessage(requestMessage, telegramUser, userEntity, request);
+        telegramService.sendReturnedMessage(chatId, response);
+    }
+
+    private String processVoidMessage(Message message) {
+        String fileId = message.getVoice().getFileId();
+        byte[] inputAudioFile = telegramService.downloadFileOrNull(fileId);
+        if (inputAudioFile == null) {
+            return null;
+        }
+        return openAiIntegrationService.fetchAudioResponse(inputAudioFile);
+    }
+
+    private String getResponseMessage(Message requestMessage, TelegramUser telegramUser,
+                                      UserEntity userEntity, String request) {
         String response;
         try {
             ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
@@ -51,14 +66,15 @@ public class InterviewUpdateHandler implements UpdateHandler {
 
             if (requestMessage.hasVoice()) {
                 byte[] outputAudioFile = openAiIntegrationService.makeSpeech(response);
-                String filename = chatId + requestMessage.getMessageId() + "";
-                telegramService.sendVoiceMessage(chatId, outputAudioFile, filename);
+                String filename = requestMessage.getChatId() + requestMessage.getMessageId() + "";
+                telegramService.sendVoiceMessage(requestMessage.getChatId(), outputAudioFile, filename);
             }
+        } catch (TelegramApiException e) {
+            return VOICE_ERROR_RESPONSE_MESSAGE;
         } catch (Exception e) {
-            response = ERROR_MESSAGE;
+            return ERROR_MESSAGE;
         }
-
-        telegramService.sendReturnedMessage(chatId, response);
+        return response;
     }
 
     @Override
