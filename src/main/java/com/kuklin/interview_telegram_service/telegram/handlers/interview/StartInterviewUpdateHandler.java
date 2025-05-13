@@ -35,15 +35,20 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
     public void handle(Update update, UserEntity userEntity) {
         Message requestMessage = update.getMessage();
         Long chatId = requestMessage.getChatId();
-        String response;
 
         if (userEntity.getJobTitle() == null || userEntity.getJobTitle().isEmpty()) {
             telegramService.sendReturnedMessage(chatId, JOB_ERROR_MESSAGE);
             return;
         }
+
         String aiRequestMessage = String.format(AI_REQUEST_MESSAGE,
                 userEntity.getJobTitle(), userEntity.getProperties());
 
+        processInterviewFlow(aiRequestMessage, chatId, userEntity);
+
+    }
+
+    public void processInterviewFlow(String aiRequestMessage, Long chatId, UserEntity userEntity) {
         TelegramUser telegramUser = telegramUserService.setBotStateByIdOrGetNull(
                 userEntity.getTelegramId(), BotState.INTERVIEW);
 
@@ -54,6 +59,7 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
 
         Long conversationId = conversationService.getNewConversation(userEntity).getId();
 
+        String response;
         try {
             ChatMessage chatMessage = chatMessageService.processUserMessageOrGetNull(
                     MessageRequestDto.getDefault(aiRequestMessage, conversationId),
@@ -69,7 +75,6 @@ public class StartInterviewUpdateHandler implements UpdateHandler {
         telegramService.sendReturnedMessage(chatId, response);
 
         interviewService.saveInterview(conversationId, userEntity);
-
     }
 
     @Override
