@@ -65,10 +65,20 @@ public class TelegramFacade {
         if (currentUpdateHandler != null) {
             return currentUpdateHandler;
         } else if (telegramUser.getBotState() == BotState.WAIT) {
-            return updateHandlerMap.get(Command.ERROR.getCommandText());
+            if (isValidatedUrl(request)) {
+                return updateHandlerMap.get(Command.URL_PROCESS.getCommandText());
+            } else {
+                return updateHandlerMap.get(Command.ERROR.getCommandText());
+            }
         } else {
             return updateHandlerMap.get(Command.INTERVIEW.getCommandText());
         }
 
+    }
+
+    private boolean isValidatedUrl(String url) {
+        return url.startsWith("https://hh.ru/vacancy") ||
+                url.startsWith("hh.ru/vacancy")
+                ;
     }
 }
