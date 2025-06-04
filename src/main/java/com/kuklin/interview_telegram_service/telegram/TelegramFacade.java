@@ -42,7 +42,7 @@ public class TelegramFacade {
         User user = update.getMessage() != null ?
                 update.getMessage().getFrom() :
                 update.getCallbackQuery().getFrom();
-        if (List.of(425120436L, 420478432L).contains(user.getId())) return;
+        if (!List.of(425120436L, 420478432L).contains(user.getId())) return;
 
         UserEntity userEntity = userService.getOrCreateUser(user);
 
