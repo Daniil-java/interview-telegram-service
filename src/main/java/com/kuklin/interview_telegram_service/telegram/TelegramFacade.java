@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,7 +42,7 @@ public class TelegramFacade {
         User user = update.getMessage() != null ?
                 update.getMessage().getFrom() :
                 update.getCallbackQuery().getFrom();
-        if (user.getId() != 425120436L) return;
+        if (List.of(425120436L, 420478432L).contains(user.getId())) return;
 
         UserEntity userEntity = userService.getOrCreateUser(user);
 
