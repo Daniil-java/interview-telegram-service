@@ -14,6 +14,9 @@ public enum Command {
     HISTORY("/history"),
     RESULTS("/results"),
     ERROR("error"),
-    INTERVIEW("interview");
+    INTERVIEW("interview"),
+    URL_PROCESS("url_process"),
+    RANDOM_INTERVIEW("/random_interview")
+    ;
     private final String commandText;
 }
