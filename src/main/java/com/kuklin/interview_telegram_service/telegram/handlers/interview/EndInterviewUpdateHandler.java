@@ -12,12 +12,14 @@ import com.kuklin.interview_telegram_service.telegram.handlers.UpdateHandler;
 import com.kuklin.interview_telegram_service.telegram.utils.BotState;
 import com.kuklin.interview_telegram_service.telegram.utils.Command;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EndInterviewUpdateHandler implements UpdateHandler {
     private final TelegramService telegramService;
     private final TelegramUserService telegramUserService;
@@ -47,6 +49,7 @@ public class EndInterviewUpdateHandler implements UpdateHandler {
                     MessageRequestDto.getDefault(AI_REQUEST_MESSAGE, conversationId), userEntity);
             response = chatMessage.getContent();
         } catch (Exception e) {
+            log.error("Ошибка при попытке отправить сообщение в ИИ-чат!", e);
             response = ERROR_MESSAGE;
         }
 
