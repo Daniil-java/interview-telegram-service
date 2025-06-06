@@ -41,7 +41,7 @@ public class TelegramService {
     }
 
     public void sendVoiceMessage(long chatId, byte[] outputAudioFile, String filename) throws TelegramApiException {
-        String format = ".ogg";
+        String format = ".mp3";
         if (!filename.endsWith(format)) {
             filename = filename.trim() + format;
         }
