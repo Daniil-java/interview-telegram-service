@@ -16,7 +16,8 @@ public enum Command {
     ERROR("error"),
     INTERVIEW("interview"),
     URL_PROCESS("url_process"),
-    RANDOM_INTERVIEW("/random_interview")
+    RANDOM_INTERVIEW("/random_interview"),
+    COACH("/coach")
     ;
     private final String commandText;
 }
