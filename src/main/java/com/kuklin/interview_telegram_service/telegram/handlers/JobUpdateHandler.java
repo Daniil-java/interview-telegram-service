@@ -35,13 +35,13 @@ public class JobUpdateHandler implements UpdateHandler {
         Long chatId = requestMessage.getChatId();
         String response;
 
-        String jobTittle = requestMessage.getText().substring(
+        String jobTitle = requestMessage.getText().substring(
                 getHandlerListName().length());
 
         try {
             MessageRequestDto messageRequestDto =
                     MessageRequestDto.getServiceMessage(
-                            String.format(AI_REQUEST_MESSAGE, jobTittle));
+                            String.format(AI_REQUEST_MESSAGE, jobTitle));
 
             response = chatMessageService.sendServiceMessage(userEntity, messageRequestDto);
         } catch (ErrorResponseException e) {
@@ -54,7 +54,7 @@ public class JobUpdateHandler implements UpdateHandler {
             return;
         }
 
-        userEntity = userService.save(userEntity.setJobTitle(jobTittle));
+        userEntity = userService.save(userEntity.setJobTitle(jobTitle));
 
         telegramService.sendReturnedMessage(
                 chatId, SUCCESS_MESSAGE + userEntity.getJobTitle());

@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class VacancyDto {
-    private String tittle;
+    private String title;
 
     private String sourceUrl;
 

@@ -43,10 +43,10 @@ public class VacancyService {
             Название вакансии или должности: %s
             """;
 
-    public Vacancy createVacancyName(UserEntity user, String tittle) throws JsonProcessingException {
+    public Vacancy createVacancyName(UserEntity user, String title) throws JsonProcessingException {
         //Формирование сообщения для сервиса общения с ИИ
         MessageRequestDto messageRequestDto = new MessageRequestDto()
-                .setContent(String.format(REQUEST, tittle))
+                .setContent(String.format(REQUEST, title))
                 .setModel(ChatModel.GPT4O);
         String jsonAnswer =
                 chatMessageService.sendServiceMessage(user, messageRequestDto);
@@ -58,7 +58,7 @@ public class VacancyService {
         );
 
         Vacancy vacancy = new Vacancy()
-                .setTittle(tittle)
+                .setTitle(title)
                 .setUserId(user.getId());
         vacancy = vacancyRepository.save(vacancy);
 

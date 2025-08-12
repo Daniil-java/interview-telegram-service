@@ -45,7 +45,7 @@ public class CoachUpdateHandler implements UpdateHandler {
 
     private String getResponseMessage(Vacancy vacancy) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(vacancy.getTittle()).append("\n");
+        stringBuilder.append(vacancy.getTitle()).append("\n");
         List<Skill> skills = skillService.getSkillsByVacancyId(vacancy);
 
         for (Skill skill: skills) {

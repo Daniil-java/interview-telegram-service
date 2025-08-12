@@ -18,7 +18,7 @@ public class Interview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String jobTittle;
+    private String jobTitle;
     private String result;
     @OneToOne
     @JoinColumn(name = "conversation_id")
