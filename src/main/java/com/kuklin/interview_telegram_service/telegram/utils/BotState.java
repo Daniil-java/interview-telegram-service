@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum BotState {
     WAIT,
-    INTERVIEW;
+    INTERVIEW,
+    TOPIC_INTERVIEW;
 
 
 }

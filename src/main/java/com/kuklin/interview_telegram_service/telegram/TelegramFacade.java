@@ -71,6 +71,8 @@ public class TelegramFacade {
             } else {
                 return updateHandlerMap.get(Command.ERROR.getCommandText());
             }
+        } else if (telegramUser.getBotState() == BotState.TOPIC_INTERVIEW) {
+            return updateHandlerMap.get(Command.TOPIC_INTERVIEW.getCommandText());
         } else {
             return updateHandlerMap.get(Command.INTERVIEW.getCommandText());
         }

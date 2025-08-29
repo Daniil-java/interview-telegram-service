@@ -57,4 +57,8 @@ public class TelegramUserService {
             return telegramUser.get();
         }
     }
+
+    public TelegramUser save(TelegramUser telegramUser) {
+        return telegramUserRepository.save(telegramUser);
+    }
 }

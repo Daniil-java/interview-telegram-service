@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "topicsProgress")
+@Table(name = "topic_progress")
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -17,11 +17,10 @@ public class TopicProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "topicId")
-    private Topic topic;
+    @Column(name = "topic_id", nullable = false)
+    private Long topicId;
 
     private Integer confidenceLevel;
 

@@ -26,6 +26,7 @@ public class TelegramUser {
     @Enumerated(EnumType.STRING)
     private BotState botState;
     private Long actualAiConversationId;
+    private Long actualTopicId;
     @UpdateTimestamp
     private LocalDateTime updated;
     @CreationTimestamp

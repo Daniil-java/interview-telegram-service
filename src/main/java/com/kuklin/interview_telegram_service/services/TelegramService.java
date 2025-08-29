@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -40,6 +42,12 @@ public class TelegramService {
         return sendReturnedMessage(chatId, text, null, null);
     }
 
+    public void sendEditMessage(long chatId, String text,
+                                   int messageId, InlineKeyboardMarkup inlineKeyboardMarkup) {
+
+        telegramBot.sendMessage(buildEditMessage(chatId, text, messageId, inlineKeyboardMarkup));
+    }
+
     public void sendVoiceMessage(long chatId, byte[] outputAudioFile, String filename) throws TelegramApiException {
         String format = ".mp3";
         if (!filename.endsWith(format)) {
@@ -61,6 +69,17 @@ public class TelegramService {
                 .replyToMessageId(replyMessageId)
                 .parseMode(ParseMode.HTML)
                 .disableWebPagePreview(true)
+                .build();
+    }
+
+    private EditMessageText buildEditMessage(long chatId, String text, int messageId,
+                                             InlineKeyboardMarkup inlineKeyboardMarkup) {
+        return EditMessageText.builder()
+                .chatId(chatId)
+                .text(text)
+                .messageId(messageId)
+                .replyMarkup(inlineKeyboardMarkup)
+                .parseMode(ParseMode.HTML)
                 .build();
     }
 

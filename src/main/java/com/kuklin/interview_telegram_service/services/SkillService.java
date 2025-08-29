@@ -1,11 +1,13 @@
 package com.kuklin.interview_telegram_service.services;
 
+import com.kuklin.interview_telegram_service.entities.UserEntity;
 import com.kuklin.interview_telegram_service.entities.coach.Skill;
 import com.kuklin.interview_telegram_service.entities.coach.Vacancy;
 import com.kuklin.interview_telegram_service.models.SkillDto;
 import com.kuklin.interview_telegram_service.repositories.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -20,11 +22,19 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final TopicService topicService;
 
-    public List<Skill> getSkillsByVacancyId(Vacancy vacancy) {
-        return skillRepository.findAllByVacanciesContains(vacancy);
+    public List<Skill> getSkillsByVacancy(Vacancy vacancy) {
+        return skillRepository.findAllByVacancyId(vacancy.getId());
     }
 
-    public Set<Skill> createNewSkillsOrGetExists(Set<SkillDto> skillDtos, Vacancy vacancy) {
+    public Skill getSkillByIdOrNull(Long skillId) {
+        return skillRepository.findById(skillId).orElse(null);
+    }
+
+    public List<Skill> getPagingSkillsByVacancyId(Long vacancyId, Pageable paging) {
+        return skillRepository.findAllByVacancyId(vacancyId, paging).getContent();
+    }
+
+    public Set<Skill> createNewSkillsOrGetExists(Set<SkillDto> skillDtos, Vacancy vacancy, UserEntity user) {
         Set<Skill> set = new HashSet<>();
         for (SkillDto dto: skillDtos) {
             //Проверка существувования такого навыка
@@ -42,7 +52,7 @@ public class SkillService {
                         .setVacancies(new HashSet<>(List.of(vacancy)));
                 skill = skillRepository.save(skill);
 
-                topicService.createNewTopics(dto.getTopics(), skill);
+                topicService.createNewTopics(dto.getTopics(), skill, user);
 
             }
         }

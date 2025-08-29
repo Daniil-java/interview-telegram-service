@@ -13,7 +13,8 @@ public enum ErrorStatus {
     MODEL_NOT_SUPPORTED(HttpStatus.BAD_REQUEST, "Model is not supported"),
     PROVIDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "Provider not found!"),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "User not found!"),
-    USER_INSUFFICIENT_FUNDS(HttpStatus.BAD_REQUEST, "Insufficient funds in the account!");
+    USER_INSUFFICIENT_FUNDS(HttpStatus.BAD_REQUEST, "Insufficient funds in the account!"),
+    VACANCY_NOT_FOUND(HttpStatus.BAD_REQUEST, "Vacancy not found!");
 
     private HttpStatus httpStatus;
     private String message;

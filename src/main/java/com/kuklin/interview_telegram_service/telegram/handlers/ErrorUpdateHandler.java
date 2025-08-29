@@ -15,8 +15,12 @@ public class ErrorUpdateHandler implements UpdateHandler {
     private final TelegramService telegramService;
     @Override
     public void handle(Update update, UserEntity userEntity) {
+        long chatId = update.hasCallbackQuery() ?
+                update.getCallbackQuery().getMessage().getChatId() :
+                update.getMessage().getChatId();
+
         telegramService.sendReturnedMessage(
-                update.getMessage().getChatId(),
+                chatId,
                 RESPONSE
         );
     }

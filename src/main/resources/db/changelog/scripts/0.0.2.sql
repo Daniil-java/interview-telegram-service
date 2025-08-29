@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset DanielK:1
+--changeset DanielK:2
 
 CREATE TABLE IF NOT EXISTS vacancy (
                                        id SERIAL PRIMARY KEY,
@@ -48,30 +48,10 @@ CREATE TABLE IF NOT EXISTS topics (
                                       FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE SET NULL
     );
 
-CREATE TABLE IF NOT EXISTS topic_skill (
-                                           id SERIAL PRIMARY KEY,
-                                           topic_id INTEGER NOT NULL,
-                                           skill_id INTEGER NOT NULL,
-                                           created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                           updated TIMESTAMP,
-
-                                           CONSTRAINT fk_topic
-                                           FOREIGN KEY (topic_id)
-    REFERENCES topics(id)
-    ON DELETE CASCADE,
-
-    CONSTRAINT fk_topic_skill
-    FOREIGN KEY (skill_id)
-    REFERENCES skills(id)
-    ON DELETE CASCADE,
-
-    CONSTRAINT unique_topic_skill UNIQUE (topic_id, skill_id)
-    );
-
 CREATE TABLE IF NOT EXISTS questions (
                                          id SERIAL PRIMARY KEY,
-                                         interview_id INTEGER,
                                          topic_id INTEGER,
+                                         question TEXT,
                                          answer TEXT,
                                          score INTEGER CHECK (score >= 0 AND score <= 10),
     updated TIMESTAMP,
@@ -79,17 +59,17 @@ CREATE TABLE IF NOT EXISTS questions (
     FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE SET NULL
     );
 
-CREATE TABLE IF NOT EXISTS topicsProgress (
-                                              id SERIAL PRIMARY KEY,
-                                              user_id INTEGER,
-                                              topic_id INTEGER,
-                                              confidence_level INTEGER,
-                                              last_reviewed DATE,
-                                              is_weak_area BOOLEAN,
-                                              updated TIMESTAMP,
-                                              created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                              FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
-    );
+CREATE TABLE topic_progress (
+                                id SERIAL PRIMARY KEY,
+                                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                topic_id INT NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
 
+                                confidence_level INT CHECK (confidence_level BETWEEN 0 AND 100),
+                                is_weak_area BOOLEAN DEFAULT FALSE,
+                                last_reviewed TIMESTAMP,
 
+                                created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                updated TIMESTAMP,
 
+                                UNIQUE (user_id, topic_id)
+);
