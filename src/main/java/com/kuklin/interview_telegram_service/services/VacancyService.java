@@ -5,14 +5,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kuklin.interview_telegram_service.entities.UserEntity;
 import com.kuklin.interview_telegram_service.entities.coach.Vacancy;
+import com.kuklin.interview_telegram_service.exceptions.ErrorResponseException;
+import com.kuklin.interview_telegram_service.exceptions.ErrorStatus;
 import com.kuklin.interview_telegram_service.models.MessageRequestDto;
 import com.kuklin.interview_telegram_service.models.SkillDto;
 import com.kuklin.interview_telegram_service.models.enums.ChatModel;
 import com.kuklin.interview_telegram_service.repositories.VacancyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -62,8 +66,21 @@ public class VacancyService {
                 .setUserId(user.getId());
         vacancy = vacancyRepository.save(vacancy);
 
-        skillService.createNewSkillsOrGetExists(skillDtos, vacancy);
+        skillService.createNewSkillsOrGetExists(skillDtos, vacancy, user);
 
         return vacancy;
+    }
+
+    public List<Vacancy> getVacanciesByUser(UserEntity user, Pageable paging) {
+        return vacancyRepository.findAllByUserId(user.getId(), paging);
+    }
+
+    public List<Vacancy> getVacanciesByUser(UserEntity user) {
+        return vacancyRepository.findAllByUserId(user.getId());
+    }
+
+    public Vacancy getVacancyById(Long vacancyId) {
+        return vacancyRepository.findById(vacancyId)
+                .orElseThrow(() -> new ErrorResponseException(ErrorStatus.VACANCY_NOT_FOUND));
     }
 }

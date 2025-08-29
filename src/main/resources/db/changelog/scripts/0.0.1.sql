@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS telegram_users (
                                               language_code TEXT,
                                               bot_state TEXT,
                                               actual_ai_conversation_id BIGINT,
+                                              actual_topic_id BIGINT,
                                               updated TIMESTAMP,
                                               created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
