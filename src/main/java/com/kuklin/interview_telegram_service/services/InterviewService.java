@@ -29,7 +29,7 @@ public class InterviewService {
         }
         Interview interview = new Interview()
                 .setConversation(conversation)
-                .setJobTittle(user.getJobTitle())
+                .setJobTitle(user.getJobTitle())
                 .setProperties(user.getProperties())
                 .setUser(user);
 

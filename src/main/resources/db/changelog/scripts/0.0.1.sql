@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS telegram_users (
                                               bot_state TEXT,
                                               actual_ai_conversation_id BIGINT,
                                               updated TIMESTAMP,
-                                              created TIMESTAMP
+                                              created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
                                      job_title TEXT,
                                      properties TEXT,
                                      updated TIMESTAMP,
-                                     created TIMESTAMP,
+                                     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                      FOREIGN KEY (telegram_id) REFERENCES telegram_users(telegram_id) ON DELETE CASCADE
     );
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 CREATE TABLE IF NOT EXISTS interviews (
     id SERIAL PRIMARY KEY,
-    job_tittle TEXT,
+    job_title TEXT,
     result TEXT,
     conversation_id INTEGER REFERENCES conversations(id),
     user_id INTEGER REFERENCES users(id),
